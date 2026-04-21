@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project 3: Configure a Personal Firewall & Access Controls using pfSense. Hands-on perimeter defense in my Virtual Cybersecurity Home Lab.">
+    <title>FIREWALL DEFENSE • pfSense Perimeter Security</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+        
+        :root {
+            --neon-red: #ff2d55;
+            --neon-blue: #00f0ff;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 8px var(--neon-blue),
+                0 0 20px var(--neon-blue),
+                0 0 40px var(--neon-red);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%);
+        }
+        
+        .firewall-glow {
+            box-shadow: 0 0 40px -10px #ff2d55,
+                        0 0 60px -15px #00f0ff;
+        }
+        
+        .rule-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rule-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,45,85,0.15), transparent);
+            transform: rotate(30deg);
+            animation: rule-sweep 6s linear infinite;
+        }
+        
+        @keyframes rule-sweep {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+        
+        .terminal-output {
+            font-family: ui-monospace, monospace;
+            background: #0f172a;
+            border: 2px solid #ff2d55;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0f1c] text-white font-sans overflow-x-hidden">
+    <!-- Background Canvas -->
+    <canvas id="matrix" class="fixed top-0 left-0 w-full h-full z-[-1] opacity-10 pointer-events-none"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-red-500/30">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-blue-400 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-red-500/50">🛡️</div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tighter neon-text">FIREWALL<span class="text-red-400">DEFENSE</span></h1>
+                    <p class="text-[10px] text-gray-400 -mt-1">PROJECT 03 • PERIMETER SECURITY</p>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm uppercase tracking-widest font-medium">
+                <a href="#hero" class="hover:text-red-400">OVERVIEW</a>
+                <a href="#rules" class="hover:text-red-400">RULES</a>
+                <a href="#gui" class="hover:text-red-400">pfSense GUI</a>
+                <a href="#hardening" class="hover:text-red-400">HARDENING</a>
+                <a href="#learnings" class="hover:text-red-400">OUTCOMES</a>
+            </div>
+            
+            <a href="https://github.com/YOUR-USERNAME/pfsense-firewall-project" target="_blank"
+               class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-blue-500 rounded-3xl font-semibold text-sm hover:scale-105">
+                <i class="fab fa-github"></i> 
+                GITHUB REPO
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="hero-bg min-h-screen flex items-center relative">
+        <div class="max-w-7xl mx-auto px-6 pt-20">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                <div class="md:col-span-7 space-y-8">
+                    <div class="inline-flex items-center gap-2 px-6 py-2 bg-white/5 border border-red-400/40 rounded-3xl text-red-400 text-sm">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-400"></span>
+                        </span>
+                        PERIMETER DEFENSE ACTIVE
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none neon-text">
+                        PERSONAL FIREWALL &amp;<br>ACCESS CONTROL CONFIGURATION
+                    </h1>
+                    
+                    <p class="text-2xl text-gray-300 max-w-lg">
+                        Configured pfSense as the central gateway in my Virtual Home Network Lab. 
+                        Implemented strict firewall rules, NAT, DHCP, and logging to protect the entire isolated environment.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="document.getElementById('rules').scrollIntoView({ behavior: 'smooth' })" 
+                                class="px-10 py-5 bg-red-500 hover:bg-red-600 text-white font-bold text-lg rounded-3xl flex items-center gap-3">
+                            <i class="fas fa-shield-alt"></i>
+                            VIEW FIREWALL RULES
+                        </button>
+                        <button onclick="window.open('https://github.com/YOUR-USERNAME/pfsense-firewall-project', '_blank')" 
+                                class="px-10 py-5 border-2 border-white/60 hover:border-blue-400 text-white font-semibold text-lg rounded-3xl">
+                            FULL CONFIGURATION →
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-8 text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-lock text-red-400"></i>
+                            <span>Stateful Inspection</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-route text-blue-400"></i>
+                            <span>NAT &amp; Routing</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-list-check"></i>
+                            <span>Custom Access Controls</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visual -->
+                <div class="md:col-span-5">
+                    <div class="terminal-output rounded-3xl p-8 firewall-glow text-sm leading-relaxed">
+                        <div class="flex justify-between mb-6 text-xs text-gray-400">
+                            <span>pfSense • LAN: 192.168.10.1</span>
+                            <span class="text-emerald-400">● ONLINE</span>
+                        </div>
+                        <div class="space-y-2 text-red-300 font-medium">
+                            <div>Allow LAN → Internet (HTTP/HTTPS/DNS)</div>
+                            <div>Block WAN → LAN (Default Deny)</div>
+                            <div>Log all blocked traffic</div>
+                            <div>DHCP enabled on LAN</div>
+                        </div>
+                        <div class="mt-10 text-[10px] text-blue-400 border-t border-white/10 pt-4">
+                            "I now control what enters and leaves my lab network — exactly what blue teams do in production."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-12 left-1/2 flex flex-col items-center text-xs text-gray-400">
+            <i class="fas fa-chevron-down animate-bounce text-3xl"></i>
+        </div>
+    </section>
+
+    <!-- FIREWALL RULES SECTION -->
+    <section id="rules" class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <span class="px-5 py-2 bg-red-900/30 text-red-400 text-sm rounded-full">DEFENSE IN DEPTH</span>
+            <h2 class="text-5xl font-bold tracking-tighter mt-4">Key Firewall Rules I Configured</h2>
+            <p class="text-gray-400 mt-3">Stateful rules + logging to secure my virtual lab</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="rule-card bg-gradient-to-br from-zinc-950 to-black border border-red-500/40 rounded-3xl p-8">
+                <div class="text-red-400 text-5xl mb-6">🚫</div>
+                <h3 class="text-2xl font-semibold">Default Deny (WAN → LAN)</h3>
+                <p class="mt-4 text-gray-300">All inbound traffic from the internet is blocked unless explicitly allowed. This is the golden rule of firewall security.</p>
+                <div class="mt-8 text-xs bg-black/60 px-4 py-2 rounded-2xl inline-block">Action: BLOCK • Protocol: Any • Log: Enabled</div>
+            </div>
+            
+            <div class="rule-card bg-gradient-to-br from-zinc-950 to-black border border-blue-400/40 rounded-3xl p-8">
+                <div class="text-blue-400 text-5xl mb-6">🌐</div>
+                <h3 class="text-2xl font-semibold">Outbound Access (LAN → WAN)</h3>
+                <p class="mt-4 text-gray-300">Allowed HTTP, HTTPS, DNS, and NTP from internal machines. Restricted everything else for better control.</p>
+                <div class="mt-8 text-xs bg-black/60 px-4 py-2 rounded-2xl inline-block">Action: ALLOW • Ports: 80, 443, 53 • NAT: Enabled</div>
+            </div>
+            
+            <div class="rule-card bg-gradient-to-br from-zinc-950 to-black border border-red-500/40 rounded-3xl p-8">
+                <div class="text-red-400 text-5xl mb-6">📋</div>
+                <h3 class="text-2xl font-semibold">Logging &amp; Monitoring</h3>
+                <p class="mt-4 text-gray-300">Enabled detailed logging on blocked packets. This helped me understand traffic patterns and potential threats.</p>
+                <div class="mt-8 text-xs bg-black/60 px-4 py-2 rounded-2xl inline-block">Firewall Logs + Traffic Graphs</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- pfSense GUI SHOWCASE -->
+    <section id="gui" class="bg-black py-24 border-t border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-5xl font-bold tracking-tighter text-center mb-12">pfSense Web Interface in Action</h2>
+            
+            <div class="grid md:grid-cols-2 gap-10">
+                <div>
+                    <div class="bg-zinc-950 rounded-3xl overflow-hidden border border-red-500/30">
+                        <div class="bg-black p-4 flex items-center gap-3 text-xs">
+                            <div class="flex-1 h-2 bg-red-500 rounded"></div>
+                            <span class="text-red-400">pfSense Dashboard</span>
+                        </div>
+                        <img src="https://picsum.photos/id/1015/800/450" alt="pfSense Dashboard" class="w-full">
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-4">Status Dashboard with traffic graphs and system info</p>
+                </div>
+                
+                <div>
+                    <div class="bg-zinc-950 rounded-3xl overflow-hidden border border-blue-400/30">
+                        <div class="bg-black p-4 flex items-center gap-3 text-xs">
+                            <span class="text-blue-400">Firewall • Rules</span>
+                        </div>
+                        <img src="https://picsum.photos/id/201/800/450" alt="Firewall Rules" class="w-full">
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-4">Custom rules for LAN and WAN interfaces</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HARDENING -->
+    <section id="hardening" class="max-w-7xl mx-auto px-6 py-24">
+        <h2 class="text-4xl font-bold text-center mb-12">Additional Hardening Steps I Applied</h2>
+        
+        <div class="grid md:grid-cols-4 gap-6">
+            <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                <i class="fas fa-key text-4xl text-blue-400 mb-4"></i>
+                <h4 class="font-semibold">Strong Admin Password</h4>
+                <p class="text-xs text-gray-400 mt-2">Changed default credentials immediately</p>
+            </div>
+            <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                <i class="fas fa-plug text-4xl text-red-400 mb-4"></i>
+                <h4 class="font-semibold">Interface Assignment</h4>
+                <p class="text-xs text-gray-400 mt-2">Proper WAN/LAN separation in VirtualBox</p>
+            </div>
+            <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                <i class="fas fa-dhcp text-4xl text-blue-400 mb-4"></i>
+                <h4 class="font-semibold">DHCP Server</h4>
+                <p class="text-xs text-gray-400 mt-2">Configured with limited address pool</p>
+            </div>
+            <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                <i class="fas fa-chart-line text-4xl text-red-400 mb-4"></i>
+                <h4 class="font-semibold">Traffic Monitoring</h4>
+                <p class="text-xs text-gray-400 mt-2">Real-time graphs and logs enabled</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEARNING OUTCOMES -->
+    <section id="learnings" class="bg-gradient-to-b from-black to-slate-950 py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold tracking-tighter">What This Project Taught Me</h2>
+                <p class="text-red-400 mt-3">Core blue-team skills for real enterprise environments</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-10">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">🛡️</div>
+                    <h4 class="font-semibold mb-3">Perimeter Security Mindset</h4>
+                    <p class="text-gray-400 text-sm">Default-deny policy and least-privilege access are now second nature.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">📡</div>
+                    <h4 class="font-semibold mb-3">Traffic Control &amp; NAT</h4>
+                    <p class="text-gray-400 text-sm">Understood how real networks route and protect traffic between trusted and untrusted zones.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">🔍</div>
+                    <h4 class="font-semibold mb-3">Logging &amp; Visibility</h4>
+                    <p class="text-gray-400 text-sm">The importance of monitoring — you can't defend what you can't see.</p>
+                </div>
+            </div>
+            
+            <div class="mt-20 text-center">
+                <p class="text-lg text-gray-300">This project bridges Projects 1 &amp; 2 with real defensive capabilities.</p>
+                <p class="text-red-400 mt-2">Next: Packet Analysis with Wireshark (Project 4)</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-3xl font-semibold neon-text">Protecting the Lab, One Rule at a Time</p>
+            <p class="mt-4 text-gray-400">Project 3 of 5 • Virtual Cybersecurity Portfolio</p>
+            
+            <a href="https://github.com/YOUR-USERNAME/pfsense-firewall-project" target="_blank"
+               class="mt-12 inline-block px-10 py-6 bg-white text-black rounded-3xl font-semibold text-lg">
+                <i class="fab fa-github mr-3"></i> VIEW FULL DOCUMENTATION &amp; CONFIG FILES
+            </a>
+            
+            <p class="text-xs text-gray-500 mt-16">Built by ANSU • April 2026 • HTML • Tailwind • JavaScript</p>
+        </div>
+    </footer>
+
+    <script>
+        // Matrix rain
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        const chars = "01🛡️FIREWALLRULESNATLOGGINGBLOCKALLOW";
+        const fontSize = 14;
+        let drops = [];
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(10, 15, 28, 0.12)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#ff2d55';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        
+        function startMatrix() {
+            resizeCanvas();
+            drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            setInterval(draw, 45);
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            });
+        }
+        
+        window.onload = () => {
+            startMatrix();
+            console.log('%c🛡️ Firewall Defense Portfolio Website Loaded!', 'color:#ff2d55; font-weight:bold');
+        };
+    </script>
+</body>
+</html>
