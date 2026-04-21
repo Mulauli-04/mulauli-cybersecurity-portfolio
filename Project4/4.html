@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project 4: Packet Analysis &amp; Traffic Monitoring with Wireshark. Deep dive into network protocols and anomaly detection in my virtual cybersecurity lab.">
+    <title>WIRESHARK ANALYSIS • Packet Capture &amp; Traffic Monitoring</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+        
+        :root {
+            --neon-cyan: #22d3ee;
+            --neon-purple: #a855f7;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 10px var(--neon-cyan),
+                0 0 25px var(--neon-cyan),
+                0 0 45px var(--neon-purple);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0c1620 0%, #1e2937 100%);
+        }
+        
+        .packet-line {
+            animation: packet-flow 3s linear infinite;
+        }
+        
+        @keyframes packet-flow {
+            0% { transform: translateX(-150%); }
+            100% { transform: translateX(300%); }
+        }
+        
+        .capture-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .capture-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.15), transparent);
+            animation: scanline 4s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(400%); }
+        }
+        
+        .terminal-output {
+            font-family: ui-monospace, monospace;
+            background: #0f172a;
+            border: 2px solid #22d3ee;
+        }
+        
+        .protocol-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0f1c] text-white font-sans overflow-x-hidden">
+    <!-- Background Canvas -->
+    <canvas id="matrix" class="fixed top-0 left-0 w-full h-full z-[-1] opacity-10 pointer-events-none"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-cyan-400/30">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-cyan-400/50">📡</div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tighter neon-text">WIRESHARK<span class="text-cyan-400">ANALYSIS</span></h1>
+                    <p class="text-[10px] text-gray-400 -mt-1">PROJECT 04 • PACKET CAPTURE &amp; MONITORING</p>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm uppercase tracking-widest font-medium">
+                <a href="#hero" class="hover:text-cyan-400">OVERVIEW</a>
+                <a href="#captures" class="hover:text-cyan-400">CAPTURES</a>
+                <a href="#protocols" class="hover:text-cyan-400">PROTOCOLS</a>
+                <a href="#findings" class="hover:text-cyan-400">FINDINGS</a>
+                <a href="#learnings" class="hover:text-cyan-400">LEARNINGS</a>
+            </div>
+            
+            <a href="https://github.com/YOUR-USERNAME/wireshark-packet-analysis" target="_blank"
+               class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-3xl font-semibold text-sm hover:scale-105">
+                <i class="fab fa-github"></i> 
+                GITHUB REPO
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="hero-bg min-h-screen flex items-center relative">
+        <div class="max-w-7xl mx-auto px-6 pt-20">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                <div class="md:col-span-7 space-y-8">
+                    <div class="inline-flex items-center gap-2 px-6 py-2 bg-white/5 border border-cyan-400/30 rounded-3xl text-cyan-400 text-sm">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
+                        </span>
+                        REAL-TIME PACKET ANALYSIS
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none neon-text">
+                        PACKET ANALYSIS &amp;<br>TRAFFIC MONITORING<br>WITH WIRESHARK
+                    </h1>
+                    
+                    <p class="text-2xl text-gray-300 max-w-lg">
+                        Captured and analyzed network traffic in my virtual lab. 
+                        Deep dive into TCP/IP protocols, identified normal behavior vs anomalies, and created professional incident-style reports.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="document.getElementById('captures').scrollIntoView({ behavior: 'smooth' })" 
+                                class="px-10 py-5 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-lg rounded-3xl flex items-center gap-3">
+                            <i class="fas fa-waveform-lines"></i>
+                            VIEW PACKET CAPTURES
+                        </button>
+                        <button onclick="window.open('https://github.com/YOUR-USERNAME/wireshark-packet-analysis', '_blank')" 
+                                class="px-10 py-5 border-2 border-white/60 hover:border-purple-400 text-white font-semibold text-lg rounded-3xl">
+                            DOWNLOAD PCAP FILES →
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-8 text-sm text-gray-400">
+                        <div><i class="fas fa-plug mr-2 text-cyan-400"></i> Tool: Wireshark 4.x</div>
+                        <div><i class="fas fa-network-wired mr-2"></i> Environment: Virtual Lab</div>
+                        <div><i class="fas fa-file-export mr-2"></i> Exported: .pcapng + Reports</div>
+                    </div>
+                </div>
+                
+                <!-- Live Capture Preview -->
+                <div class="md:col-span-5">
+                    <div class="terminal-output rounded-3xl p-8 shadow-2xl border border-cyan-400/50 overflow-hidden">
+                        <div class="flex items-center justify-between mb-6 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="text-emerald-400">●</span>
+                                <span class="text-emerald-400 font-medium">Capturing on eth0</span>
+                            </div>
+                            <span class="text-gray-400">192.168.10.0/24</span>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm font-light">
+                            <div class="flex justify-between">
+                                <span class="text-cyan-300">TCP 192.168.10.10:22 → 192.168.10.1:54321</span>
+                                <span class="protocol-tag bg-cyan-900 text-cyan-300">SSH</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-purple-300">DNS Query: kali.lab → 192.168.10.1</span>
+                                <span class="protocol-tag bg-purple-900 text-purple-300">DNS</span>
+                            </div>
+                            <div class="flex justify-between text-amber-300">
+                                <span>HTTP GET /index.html 200 OK</span>
+                                <span class="protocol-tag bg-amber-900 text-amber-300">HTTP</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-10 text-[10px] text-cyan-400 border-t border-white/10 pt-4 flex items-center gap-2">
+                            <span class="animate-pulse">●</span>
+                            124 packets captured • 3 anomalies flagged
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-12 left-1/2 text-xs text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chevron-down animate-bounce text-3xl"></i>
+            SCROLL TO ANALYZE THE TRAFFIC
+        </div>
+    </section>
+
+    <!-- PACKET CAPTURES -->
+    <section id="captures" class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <span class="px-5 py-2 bg-cyan-900/30 text-cyan-400 text-sm rounded-full">HANDS-ON CAPTURES</span>
+            <h2 class="text-5xl font-bold tracking-tighter mt-4">What I Captured &amp; Analyzed</h2>
+            <p class="text-gray-400 mt-3">Normal traffic + simulated attacks in the isolated lab</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="capture-card bg-zinc-950 border border-cyan-400/30 rounded-3xl p-8">
+                <div class="text-cyan-400 text-5xl mb-6">🔄</div>
+                <h3 class="text-2xl font-semibold">TCP 3-Way Handshake</h3>
+                <p class="text-gray-300 mt-4">Analyzed SYN → SYN-ACK → ACK sequence between Kali and Ubuntu Server. Understood connection establishment at packet level.</p>
+                <div class="mt-8 text-xs bg-black/70 px-4 py-2 rounded-2xl">Flags: SYN, ACK • Seq/Ack numbers</div>
+            </div>
+            
+            <div class="capture-card bg-zinc-950 border border-purple-400/30 rounded-3xl p-8">
+                <div class="text-purple-400 text-5xl mb-6">🌐</div>
+                <h3 class="text-2xl font-semibold">HTTP &amp; DNS Traffic</h3>
+                <p class="text-gray-300 mt-4">Captured web requests and DNS queries. Inspected headers, payloads, and identified potential information leakage.</p>
+                <div class="mt-8 flex gap-2">
+                    <span class="protocol-tag bg-purple-900 text-purple-300">HTTP</span>
+                    <span class="protocol-tag bg-cyan-900 text-cyan-300">DNS</span>
+                </div>
+            </div>
+            
+            <div class="capture-card bg-zinc-950 border border-amber-400/30 rounded-3xl p-8">
+                <div class="text-amber-400 text-5xl mb-6">⚠️</div>
+                <h3 class="text-2xl font-semibold">Anomaly Detection</h3>
+                <p class="text-gray-300 mt-4">Simulated suspicious traffic (e.g., port scan simulation) and used Wireshark filters to spot unusual patterns and potential threats.</p>
+                <div class="mt-8 text-xs text-amber-300">Applied display filters like tcp.flags.syn==1 && tcp.flags.ack==0</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROTOCOLS BREAKDOWN -->
+    <section id="protocols" class="bg-black py-24 border-t border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-5xl font-bold tracking-tighter text-center mb-12">Key Protocols I Analyzed</h2>
+            
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                    <div class="text-cyan-400 text-4xl mb-4">📦</div>
+                    <h4 class="font-semibold">TCP/IP</h4>
+                    <p class="text-xs text-gray-400 mt-3">Handshakes, sequencing, retransmissions</p>
+                </div>
+                <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                    <div class="text-purple-400 text-4xl mb-4">🔍</div>
+                    <h4 class="font-semibold">DNS</h4>
+                    <p class="text-xs text-gray-400 mt-3">Queries, responses, caching behavior</p>
+                </div>
+                <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                    <div class="text-amber-400 text-4xl mb-4">🌐</div>
+                    <h4 class="font-semibold">HTTP/HTTPS</h4>
+                    <p class="text-xs text-gray-400 mt-3">Requests, responses, headers</p>
+                </div>
+                <div class="bg-zinc-900/70 border border-white/10 rounded-3xl p-7 text-center">
+                    <div class="text-red-400 text-4xl mb-4">🛡️</div>
+                    <h4 class="font-semibold">ICMP</h4>
+                    <p class="text-xs text-gray-400 mt-3">Ping, traceroute simulations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINDINGS -->
+    <section id="findings" class="max-w-7xl mx-auto px-6 py-24">
+        <h2 class="text-4xl font-bold text-center mb-12">Key Insights &amp; Findings</h2>
+        
+        <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+            <div class="terminal-output p-8 rounded-3xl">
+                <h4 class="text-cyan-400 mb-6 flex items-center gap-3">
+                    <i class="fas fa-check"></i> Normal Traffic Patterns
+                </h4>
+                <ul class="space-y-4 text-sm text-gray-300">
+                    <li>• Clean TCP 3-way handshakes between lab machines</li>
+                    <li>• Expected DNS resolution via pfSense</li>
+                    <li>• Standard HTTP traffic from client to server</li>
+                </ul>
+            </div>
+            
+            <div class="terminal-output p-8 rounded-3xl">
+                <h4 class="text-amber-400 mb-6 flex items-center gap-3">
+                    <i class="fas fa-exclamation-triangle"></i> Anomalies Detected
+                </h4>
+                <ul class="space-y-4 text-sm text-gray-300">
+                    <li>• Multiple SYN packets without ACK (possible scan simulation)</li>
+                    <li>• Unusual port activity on Ubuntu server</li>
+                    <li>• Opportunity to implement stricter firewall rules</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="text-center mt-12 text-xs text-gray-400">
+            All analysis performed ethically in my isolated VirtualBox lab.
+        </div>
+    </section>
+
+    <!-- LEARNING OUTCOMES -->
+    <section id="learnings" class="bg-gradient-to-b from-black to-slate-950 py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold tracking-tighter">What This Project Taught Me</h2>
+                <p class="text-cyan-400 mt-3">Critical skills for SOC Analysts and Network Security roles</p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">🔎</div>
+                    <h4 class="font-semibold">Deep Protocol Understanding</h4>
+                    <p class="text-gray-400 text-sm mt-3">I can now read and explain TCP/IP communication at the packet level.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">⚡</div>
+                    <h4 class="font-semibold">Display Filters Mastery</h4>
+                    <p class="text-gray-400 text-sm mt-3">Expert use of Wireshark filters to isolate specific traffic quickly.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">📊</div>
+                    <h4 class="font-semibold">Anomaly Detection</h4>
+                    <p class="text-gray-400 text-sm mt-3">Spotting suspicious behavior through traffic patterns.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">📝</div>
+                    <h4 class="font-semibold">Professional Reporting</h4>
+                    <p class="text-gray-400 text-sm mt-3">Created clear incident-style reports with screenshots and explanations.</p>
+                </div>
+            </div>
+            
+            <div class="mt-20 text-center text-gray-400">
+                This project builds directly on the firewall rules from Project 3 — now I can see what those rules actually allow or block at the packet level.
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-3xl font-semibold neon-text">Seeing the Invisible — One Packet at a Time</p>
+            <p class="mt-4 text-gray-400">Project 4 of 5 • Cybersecurity Portfolio by ANSU</p>
+            
+            <a href="https://github.com/YOUR-USERNAME/wireshark-packet-analysis" target="_blank"
+               class="mt-12 inline-block px-10 py-6 bg-white text-black rounded-3xl font-semibold text-lg">
+                <i class="fab fa-github mr-3"></i> VIEW PCAPS, FILTERS &amp; FULL REPORTS
+            </a>
+            
+            <p class="text-xs text-gray-500 mt-16">Built by ANSU • April 2026 • Clean HTML • Tailwind • JavaScript</p>
+        </div>
+    </footer>
+
+    <script>
+        // Matrix rain background
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        const chars = "01TCPHTTPDNSICMPWIRESHARKPACKETFILTERANALYSIS";
+        const fontSize = 13;
+        let drops = [];
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 15, 28, 0.12)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#22d3ee';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        function startMatrix() {
+            resizeCanvas();
+            drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            setInterval(drawMatrix, 45);
+            
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            });
+        }
+        
+        window.onload = () => {
+            startMatrix();
+            console.log('%c📡 Wireshark Packet Analysis Portfolio Website Loaded Successfully!', 'color:#22d3ee; font-weight:bold');
+        };
+    </script>
+</body>
+</html>
