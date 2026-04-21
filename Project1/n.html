@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Virtual Cybersecurity Home Network Lab - Built with pfSense, Kali Linux, Ubuntu &amp; Windows. Interactive portfolio project by ANSU.">
+    <title>SECURE LAB • Virtual Cybersecurity Home Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --neon-green: #00ff9d;
+            --neon-blue: #00d4ff;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 5px var(--neon-green),
+                0 0 10px var(--neon-green),
+                0 0 20px var(--neon-green);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 25px 50px -12px rgb(0 255 157 / 0.3);
+        }
+        
+        .svg-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 4s linear infinite;
+        }
+        
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        .terminal {
+            font-family: 'Space Grotesk', monospace;
+            animation: blink 1s step-end infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#050505] text-white font-sans overflow-x-hidden">
+    <!-- MATRIX BACKGROUND -->
+    <canvas id="matrix" class="matrix-bg"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-lg border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-[#00ff9d] to-[#00d4ff] rounded-2xl flex items-center justify-center text-black font-bold text-xl rotate-12">🛡️</div>
+                <h1 class="text-2xl font-semibold tracking-tighter neon-text">SECURE<span class="text-[#00ff9d]">LAB</span></h1>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#hero" class="hover:text-[#00ff9d] flex items-center gap-1"><i class="fas fa-home"></i> HOME</a>
+                <a href="#topology" class="hover:text-[#00ff9d]">TOPOLOGY</a>
+                <a href="#features" class="hover:text-[#00ff9d]">FEATURES</a>
+                <a href="#gallery" class="hover:text-[#00ff9d]">GALLERY</a>
+                <a href="#outcomes" class="hover:text-[#00ff9d]">LEARNING</a>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="https://github.com/YOUR-USERNAME/virtual-cyber-lab" target="_blank"
+                   class="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-3xl font-semibold text-sm hover:bg-[#00ff9d]">
+                    <i class="fab fa-github"></i>
+                    VIEW ON GITHUB
+                </a>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- MOBILE MENU -->
+        <div id="mobileMenu" class="hidden md:hidden bg-black border-t border-white/10 px-6 py-4">
+            <div class="flex flex-col gap-4 text-sm">
+                <a href="#hero" class="py-2">🏠 Home</a>
+                <a href="#topology" class="py-2">📡 Network Topology</a>
+                <a href="#features" class="py-2">🔥 Key Features</a>
+                <a href="#gallery" class="py-2">📸 Gallery</a>
+                <a href="#outcomes" class="py-2">🚀 What I Learned</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="hero-bg min-h-screen flex items-center relative">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center pt-20">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 bg-white/10 text-[#00ff9d] text-sm font-medium px-5 py-2 rounded-3xl border border-[#00ff9d]/30">
+                    <div class="w-2 h-2 bg-[#00ff9d] rounded-full animate-pulse"></div>
+                    LIVE • ISOLATED • SECURE
+                </div>
+                
+                <h1 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none neon-text">
+                    VIRTUAL CYBERSECURITY<br>HOME NETWORK LAB
+                </h1>
+                
+                <p class="text-2xl text-gray-300 max-w-lg">
+                    Built from scratch with <span class="text-[#00ff9d]">pfSense</span>, 
+                    <span class="text-[#00d4ff]">Kali Linux</span>, Ubuntu &amp; Windows — 
+                    my isolated cyber playground for real-world network &amp; security practice.
+                </p>
+                
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="document.getElementById('topology').scrollIntoView({ behavior: 'smooth' })" 
+                            class="px-8 py-5 bg-gradient-to-r from-[#00ff9d] to-[#00d4ff] text-black font-semibold text-lg rounded-3xl flex items-center gap-3 hover:scale-105">
+                        <i class="fas fa-network-wired"></i>
+                        EXPLORE THE TOPOLOGY
+                    </button>
+                    
+                    <button onclick="window.open('https://github.com/YOUR-USERNAME/virtual-cyber-lab', '_blank')" 
+                            class="px-8 py-5 border-2 border-white/70 hover:border-[#00ff9d] text-white font-semibold text-lg rounded-3xl flex items-center gap-3">
+                        <i class="fab fa-github"></i>
+                        DOWNLOAD FULL REPO
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-8 text-sm">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-shield-alt text-[#00ff9d]"></i>
+                        <span>Perimeter Firewall</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-bug text-[#00d4ff]"></i>
+                        <span>Penetration Testing Ready</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-server"></i>
+                        <span>4 Isolated VMs</span>
+                    </div>
+                </div>
+                
+                <!-- Terminal style status -->
+                <div class="bg-black/60 border border-[#00ff9d]/30 rounded-3xl p-5 font-mono text-sm max-w-md">
+                    <p class="text-[#00ff9d] mb-2">root@securelab:~# lab-status</p>
+                    <p class="text-emerald-300">✅ pfSense Firewall ONLINE</p>
+                    <p class="text-emerald-300">✅ Kali Linux CONNECTED</p>
+                    <p class="text-emerald-300">✅ Ubuntu Server RUNNING</p>
+                    <p class="text-emerald-300">✅ Windows Client ACTIVE</p>
+                    <p class="terminal text-[#00d4ff] mt-4">NETWORK ISOLATED • NO RISK TO HOST</p>
+                </div>
+            </div>
+            
+            <!-- Floating 3D-style lab preview -->
+            <div class="relative hidden md:block">
+                <div class="absolute inset-0 bg-gradient-to-br from-[#00ff9d]/10 to-[#00d4ff]/10 rounded-[4rem] rotate-12 scale-95"></div>
+                <div class="bg-black/90 border border-[#00ff9d]/50 rounded-3xl p-8 shadow-2xl relative z-10">
+                    <div class="flex justify-between mb-8">
+                        <div class="text-center">
+                            <div class="text-5xl">🔥</div>
+                            <p class="text-xs text-[#00ff9d] mt-1">pfSense</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-5xl">🐧</div>
+                            <p class="text-xs text-[#00d4ff] mt-1">Kali</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-5xl">🐧</div>
+                            <p class="text-xs mt-1">Ubuntu</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-5xl">🪟</div>
+                            <p class="text-xs mt-1">Windows</p>
+                        </div>
+                    </div>
+                    <div class="text-center text-xs tracking-widest text-gray-400">192.168.10.0/24 • ISOLATED LAN</div>
+                    <div class="h-px bg-gradient-to-r from-transparent via-[#00ff9d] to-transparent my-6"></div>
+                    <p class="text-center text-[#00ff9d] text-sm font-medium">SECURE • SEGMENTED • READY FOR ATTACK &amp; DEFENSE</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 flex flex-col items-center text-xs text-gray-400">
+            <i class="fas fa-chevron-down animate-bounce text-2xl"></i>
+            SCROLL FOR THE FULL JOURNEY
+        </div>
+    </section>
+
+    <!-- NETWORK TOPOLOGY SECTION -->
+    <section id="topology" class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <span class="px-4 py-2 bg-white/10 text-[#00ff9d] text-sm rounded-3xl">INTERACTIVE</span>
+            <h2 class="text-5xl font-bold mt-4 tracking-tighter">Network Topology</h2>
+            <p class="text-gray-400 mt-3 max-w-md mx-auto">pfSense as the brain • Complete isolation • Real-world SOHO setup</p>
+        </div>
+        
+        <!-- Interactive SVG Topology -->
+        <div class="bg-black border border-white/10 rounded-3xl p-10 md:p-16 flex justify-center">
+            <svg id="topology-svg" width="900" height="520" viewBox="0 0 900 520" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-4xl">
+                <!-- WAN -->
+                <rect x="100" y="80" width="700" height="40" rx="8" fill="#1a1a2e" stroke="#00d4ff" stroke-width="3"/>
+                <text x="450" y="105" text-anchor="middle" fill="#fff" font-size="18" font-weight="600">INTERNET (NAT)</text>
+                
+                <!-- pfSense -->
+                <rect x="380" y="200" width="140" height="120" rx="15" fill="#111827" stroke="#00ff9d" stroke-width="8"/>
+                <text x="450" y="245" text-anchor="middle" fill="#00ff9d" font-size="24" font-weight="700">pfSense</text>
+                <text x="450" y="270" text-anchor="middle" fill="#fff" font-size="13">Firewall / Router</text>
+                <text x="450" y="295" text-anchor="middle" fill="#a3e4ff" font-size="13">192.168.10.1/24</text>
+                
+                <!-- Lines -->
+                <line x1="450" y1="120" x2="450" y2="200" stroke="#00d4ff" stroke-width="4" stroke-dasharray="8 8" class="svg-line"/>
+                
+                <!-- Kali -->
+                <rect x="120" y="380" width="110" height="110" rx="15" fill="#111827" stroke="#00d4ff" stroke-width="6"/>
+                <text x="175" y="425" text-anchor="middle" fill="#00d4ff" font-size="22" font-weight="700">KALI</text>
+                <text x="175" y="450" text-anchor="middle" fill="#fff" font-size="13">Attacker / Management</text>
+                <text x="175" y="470" text-anchor="middle" fill="#a3e4ff" font-size="13">192.168.10.10</text>
+                
+                <!-- Ubuntu -->
+                <rect x="380" y="380" width="110" height="110" rx="15" fill="#111827" stroke="#00ff9d" stroke-width="6"/>
+                <text x="435" y="425" text-anchor="middle" fill="#00ff9d" font-size="22" font-weight="700">UBUNTU</text>
+                <text x="435" y="450" text-anchor="middle" fill="#fff" font-size="13">Server / Victim</text>
+                <text x="435" y="470" text-anchor="middle" fill="#a3e4ff" font-size="13">192.168.10.20</text>
+                
+                <!-- Windows -->
+                <rect x="640" y="380" width="110" height="110" rx="15" fill="#111827" stroke="#00d4ff" stroke-width="6"/>
+                <text x="695" y="425" text-anchor="middle" fill="#00d4ff" font-size="22" font-weight="700">WINDOWS</text>
+                <text x="695" y="450" text-anchor="middle" fill="#fff" font-size="13">Client Machine</text>
+                <text x="695" y="470" text-anchor="middle" fill="#a3e4ff" font-size="13">192.168.10.30</text>
+                
+                <!-- Connecting lines -->
+                <line x1="450" y1="320" x2="175" y2="380" stroke="#00ff9d" stroke-width="5" stroke-dasharray="12 8" class="svg-line"/>
+                <line x1="450" y1="320" x2="435" y2="380" stroke="#00ff9d" stroke-width="5" stroke-dasharray="12 8" class="svg-line"/>
+                <line x1="450" y1="320" x2="695" y2="380" stroke="#00ff9d" stroke-width="5" stroke-dasharray="12 8" class="svg-line"/>
+                
+                <!-- Small glowing dots -->
+                <circle cx="450" cy="200" r="8" fill="#00ff9d" class="animate-pulse"/>
+                <circle cx="175" cy="380" r="8" fill="#00d4ff" class="animate-pulse"/>
+                <circle cx="435" cy="380" r="8" fill="#00ff9d" class="animate-pulse"/>
+                <circle cx="695" cy="380" r="8" fill="#00d4ff" class="animate-pulse"/>
+            </svg>
+        </div>
+        
+        <div class="text-center mt-6 text-xs text-gray-400 flex items-center justify-center gap-6">
+            <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#00ff9d] rounded-full"></span> LAN TRAFFIC</div>
+            <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#00d4ff] rounded-full"></span> ISOLATED VMs</div>
+            <p class="italic">Hover nodes on desktop to see live info • Built in VirtualBox</p>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="bg-black py-24 border-t border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card-hover bg-gradient-to-br from-[#111827] to-black border border-white/10 rounded-3xl p-8">
+                    <i class="fas fa-shield-alt text-4xl text-[#00ff9d] mb-6"></i>
+                    <h3 class="text-2xl font-semibold">Perimeter Defense</h3>
+                    <p class="text-gray-400 mt-3">pfSense firewall with NAT, DHCP, DNS &amp; custom rules. Complete control over inbound/outbound traffic.</p>
+                </div>
+                <div class="card-hover bg-gradient-to-br from-[#111827] to-black border border-white/10 rounded-3xl p-8">
+                    <i class="fas fa-network-wired text-4xl text-[#00d4ff] mb-6"></i>
+                    <h3 class="text-2xl font-semibold">Segmented LAN</h3>
+                    <p class="text-gray-400 mt-3">Host-only network in VirtualBox. 4 machines talk securely while fully isolated from my real laptop.</p>
+                </div>
+                <div class="card-hover bg-gradient-to-br from-[#111827] to-black border border-white/10 rounded-3xl p-8">
+                    <i class="fas fa-screwdriver-wrench text-4xl text-[#00ff9d] mb-6"></i>
+                    <h3 class="text-2xl font-semibold">Snapshot Ready</h3>
+                    <p class="text-gray-400 mt-3">Instant rollback. Safe playground for scanning, attacking, and breaking things without consequences.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY / Screenshots -->
+    <section id="gallery" class="max-w-7xl mx-auto px-6 py-24">
+        <h2 class="text-4xl font-bold text-center mb-4">Lab in Action</h2>
+        <p class="text-center text-gray-400 mb-12">Real screenshots from my working environment</p>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="rounded-3xl overflow-hidden border border-white/10">
+                <div class="h-64 bg-gradient-to-br from-[#1a1a2e] to-black flex items-center justify-center text-6xl">🧪</div>
+                <div class="p-6">
+                    <p class="font-semibold">pfSense Web GUI</p>
+                    <p class="text-sm text-gray-400">Firewall rules • DHCP • Traffic logs</p>
+                </div>
+            </div>
+            <div class="rounded-3xl overflow-hidden border border-white/10">
+                <div class="h-64 bg-gradient-to-br from-[#1a1a2e] to-black flex items-center justify-center text-6xl">📡</div>
+                <div class="p-6">
+                    <p class="font-semibold">VirtualBox Networks</p>
+                    <p class="text-sm text-gray-400">Host-only + NAT configuration</p>
+                </div>
+            </div>
+            <div class="rounded-3xl overflow-hidden border border-white/10">
+                <div class="h-64 bg-gradient-to-br from-[#1a1a2e] to-black flex items-center justify-center text-6xl">🔍</div>
+                <div class="p-6">
+                    <p class="font-semibold">Kali Linux Terminal</p>
+                    <p class="text-sm text-gray-400">Ready for Nmap, Wireshark &amp; more</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEARNING OUTCOMES -->
+    <section id="outcomes" class="bg-[#0a0a0a] py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center">
+                <h2 class="text-5xl font-bold tracking-tighter">What This Project Taught Me</h2>
+                <p class="text-[#00ff9d] mt-3">Skills that recruiters actually want to see</p>
+            </div>
+            
+            <div class="mt-16 grid md:grid-cols-2 gap-8">
+                <div class="flex gap-6">
+                    <div class="text-5xl font-mono text-[#00ff9d]">01</div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Network Design &amp; Subnetting</h4>
+                        <p class="text-gray-400">Built a complete SOHO network from zero. IP addressing, routing, DHCP, DNS — all configured manually.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="text-5xl font-mono text-[#00d4ff]">02</div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Safe Virtualization Practices</h4>
+                        <p class="text-gray-400">Snapshots, resource allocation, isolated networks. The foundation for all future pentesting &amp; blue-team work.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="text-5xl font-mono text-[#00ff9d]">03</div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Perimeter Security Mindset</h4>
+                        <p class="text-gray-400">Firewall rules, NAT, logging — I now understand how real enterprises protect their networks.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="text-5xl font-mono text-[#00d4ff]">04</div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Professional Documentation</h4>
+                        <p class="text-gray-400">This entire website + detailed GitHub README. Recruiters love clear, visual, step-by-step explanations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER / CALL TO ACTION -->
+    <footer class="bg-black border-t border-white/10 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-3xl font-semibold neon-text">Ready to see the lab live?</p>
+            <p class="mt-4 text-gray-400">Clone the repo, follow the step-by-step guide, and build your own.</p>
+            
+            <a href="https://github.com/YOUR-USERNAME/virtual-cyber-lab" target="_blank"
+               class="mt-10 inline-flex items-center gap-4 text-xl font-semibold px-10 py-6 bg-white text-black rounded-3xl">
+                <i class="fab fa-github text-3xl"></i>
+                GET THE FULL PROJECT FILES
+            </a>
+            
+            <p class="text-xs text-gray-500 mt-12">Built by ANSU • Virtual Cybersecurity Home Network Lab • April 2026</p>
+            <p class="text-xs text-gray-500">Made with pure HTML • CSS • JavaScript • Tailwind • Love for cybersecurity ❤️</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tailwind script already loaded — initialize
+        function initializeTailwind() {
+            return {
+                config(userConfig = {}) {
+                    return {
+                        configUser: userConfig,
+                        theme: {
+                            extend: {}
+                        }
+                    }
+                },
+                theme: {
+                    extend: {}
+                }
+            }
+        }
+        const config = initializeTailwind()
+        document.documentElement.setAttribute('data-tailwind-config', JSON.stringify(config))
+
+        // MATRIX RAIN BACKGROUND
+        const canvas = document.getElementById('matrix')
+        const ctx = canvas.getContext('2d')
+        
+        let width, height
+        function resizeCanvas() {
+            width = window.innerWidth
+            height = window.innerHeight
+            canvas.width = width
+            canvas.height = height
+        }
+        
+        const chars = '01アイウエオカキクケコ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        const fontSize = 14
+        let drops = []
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'
+            ctx.fillRect(0, 0, width, height)
+            
+            ctx.fillStyle = '#00ff9d'
+            ctx.font = `${fontSize}px monospace`
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)]
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize)
+                
+                if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                    drops[i] = 0
+                }
+                drops[i]++
+            }
+        }
+        
+        function startMatrix() {
+            resizeCanvas()
+            drops = Array(Math.floor(width / fontSize)).fill(1)
+            
+            setInterval(() => {
+                drawMatrix()
+            }, 35)
+            
+            window.addEventListener('resize', () => {
+                resizeCanvas()
+                drops = Array(Math.floor(width / fontSize)).fill(1)
+            })
+        }
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu')
+            menu.classList.toggle('hidden')
+        }
+        
+        // Make SVG nodes interactive
+        function makeTopologyInteractive() {
+            const svg = document.getElementById('topology-svg')
+            if (!svg) return
+            
+            // Add simple tooltip on click for mobile/desktop
+            svg.addEventListener('click', (e) => {
+                const target = e.target
+                if (target.tagName === 'rect' || target.tagName === 'text') {
+                    let message = ''
+                    if (target.textContent.includes('pfSense')) {
+                        message = '🛡️ pfSense Firewall\n\nHandles all traffic routing, NAT, DHCP &amp; security rules.'
+                    } else if (target.textContent.includes('KALI')) {
+                        message = '🐧 Kali Linux\n\nMy main attack &amp; reconnaissance workstation.'
+                    } else if (target.textContent.includes('UBUNTU')) {
+                        message = '🐧 Ubuntu Server\n\nBackend services &amp; victim machine for testing.'
+                    } else if (target.textContent.includes('WINDOWS')) {
+                        message = '🪟 Windows 11\n\nRealistic end-user client machine.'
+                    }
+                    if (message) alert(message)
+                }
+            })
+            
+            console.log('%c✅ Interactive topology ready!', 'color:#00ff9d; font-size:13px')
+        }
+        
+        // Initialize everything
+        window.onload = function() {
+            startMatrix()
+            makeTopologyInteractive()
+            
+            console.log('%c🚀 Stunning Cybersecurity Portfolio Website Loaded Successfully!', 'color:#00ff9d; font-size:18px; font-weight:bold')
+            console.log('Copy this entire file as index.html and host it on GitHub Pages for your portfolio!')
+        }
+    </script>
+</body>
+</html>
