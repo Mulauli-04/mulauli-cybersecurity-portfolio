@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Network Scanning & Reconnaissance with Nmap - Project 2 of my Cybersecurity Portfolio. Hands-on scanning of my virtual lab network using Nmap.">
+    <title>NMAP RECON • Network Scanning Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+        
+        :root {
+            --neon-purple: #c026d3;
+            --neon-cyan: #06f7f7;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 8px var(--neon-cyan),
+                0 0 16px var(--neon-cyan),
+                0 0 30px var(--neon-purple);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0f0a1f 0%, #1a0f2e 100%);
+        }
+        
+        .scan-line {
+            position: relative;
+        }
+        
+        .scan-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #06f7f7, transparent);
+            animation: scan 4s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(800%); }
+        }
+        
+        .terminal-output {
+            font-family: ui-monospace, monospace;
+            background: #0a0a0a;
+            border: 1px solid #22d3ee;
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-12px) rotate(1deg);
+            box-shadow: 0 30px 60px -15px rgb(192 38 211 / 0.4);
+        }
+        
+        .nmap-command {
+            background: #111827;
+            border-left: 4px solid #c026d3;
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-white font-sans overflow-x-hidden">
+    <!-- MATRIX-STYLE BACKGROUND -->
+    <canvas id="matrix" class="fixed top-0 left-0 w-full h-full z-[-1] opacity-10 pointer-events-none"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-cyan-500/30">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-cyan-500/50">🔍</div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tighter neon-text">NMAP<span class="text-cyan-400">RECON</span></h1>
+                    <p class="text-[10px] text-gray-400 -mt-1">PROJECT 02 • NETWORK SCANNING</p>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm uppercase tracking-widest font-medium">
+                <a href="#hero" class="hover:text-cyan-400">OVERVIEW</a>
+                <a href="#scans" class="hover:text-cyan-400">SCANS</a>
+                <a href="#findings" class="hover:text-cyan-400">FINDINGS</a>
+                <a href="#commands" class="hover:text-cyan-400">COMMANDS</a>
+                <a href="#learnings" class="hover:text-cyan-400">WHAT I LEARNED</a>
+            </div>
+            
+            <a href="https://github.com/YOUR-USERNAME/nmap-recon-project" target="_blank"
+               class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-3xl font-semibold text-sm hover:scale-105">
+                <i class="fab fa-github"></i> 
+                GITHUB REPO
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="hero-bg min-h-screen flex items-center relative scan-line">
+        <div class="max-w-7xl mx-auto px-6 pt-20">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                <div class="md:col-span-7 space-y-8">
+                    <div class="inline-flex items-center gap-2 px-6 py-2 bg-white/5 border border-cyan-400/30 rounded-3xl text-cyan-400 text-sm">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
+                        </span>
+                        ACTIVE RECONNAISSANCE
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none neon-text">
+                        NETWORK SCANNING<br>&amp; RECON WITH NMAP
+                    </h1>
+                    
+                    <p class="text-2xl text-gray-300 max-w-lg">
+                        Explored my Virtual Home Network Lab using Nmap — discovered hosts, open ports, services, OS versions, and potential vulnerabilities.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="document.getElementById('scans').scrollIntoView({ behavior: 'smooth' })" 
+                                class="px-10 py-5 bg-white text-black font-bold text-lg rounded-3xl flex items-center gap-3 hover:bg-cyan-400">
+                            <i class="fas fa-terminal"></i>
+                            VIEW LIVE SCANS
+                        </button>
+                        <button onclick="window.open('https://github.com/YOUR-USERNAME/nmap-recon-project', '_blank')" 
+                                class="px-10 py-5 border-2 border-white/60 hover:border-purple-400 text-white font-semibold text-lg rounded-3xl">
+                            FULL REPORT →
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-10 text-sm text-gray-400">
+                        <div><i class="fas fa-network-wired mr-2 text-cyan-400"></i> Target: 192.168.10.0/24</div>
+                        <div><i class="fas fa-shield-alt mr-2 text-purple-400"></i> Tool: Nmap 7.94</div>
+                        <div><i class="fas fa-clock mr-2"></i> Duration: Multiple phased scans</div>
+                    </div>
+                </div>
+                
+                <!-- Terminal Preview -->
+                <div class="md:col-span-5">
+                    <div class="terminal-output rounded-3xl p-8 shadow-2xl border border-cyan-500/50 text-sm leading-relaxed overflow-hidden">
+                        <div class="flex items-center gap-2 text-purple-400 mb-4">
+                            <span class="text-xs">root@kali:~/lab#</span>
+                            <span class="flex-1 h-px bg-gradient-to-r from-purple-400/30 to-transparent"></span>
+                        </div>
+                        <div class="text-emerald-400 font-medium mb-1">$ nmap -sV -O 192.168.10.0/24</div>
+                        <div class="text-gray-300">Host is up (0.001s latency).</div>
+                        <div class="text-emerald-400">PORT   STATE SERVICE VERSION</div>
+                        <div class="text-amber-300">22/tcp open  ssh     OpenSSH 9.x</div>
+                        <div class="text-amber-300">80/tcp open  http    Apache 2.4</div>
+                        <div class="text-purple-400 mt-6">OS details: Linux 5.15 - 6.8</div>
+                        <div class="text-cyan-400 animate-pulse mt-8 text-xs">SCAN COMPLETE • 4 hosts discovered</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-12 left-1/2 text-center text-xs text-gray-500">
+            <i class="fas fa-chevron-down animate-bounce text-3xl"></i><br>
+            SCROLL TO EXPLORE THE RECON
+        </div>
+    </section>
+
+    <!-- SCANS SECTION -->
+    <section id="scans" class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <span class="px-5 py-2 bg-purple-900/30 text-purple-400 text-sm rounded-full">PHASED APPROACH</span>
+            <h2 class="text-5xl font-bold tracking-tighter mt-4">My Nmap Scanning Journey</h2>
+            <p class="text-gray-400 mt-3">From basic discovery to aggressive enumeration on the virtual lab</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Scan Card 1 -->
+            <div class="card-hover bg-gradient-to-br from-zinc-950 to-black border border-purple-500/30 rounded-3xl p-8">
+                <div class="text-purple-400 text-4xl mb-6">📡</div>
+                <h3 class="text-2xl font-semibold">Host Discovery</h3>
+                <div class="text-xs text-gray-400 mt-1">nmap -sn 192.168.10.0/24</div>
+                <p class="mt-6 text-gray-300">Discovered 4 live hosts in the lab network including pfSense, Kali, Ubuntu and Windows.</p>
+                <div class="mt-8 pt-6 border-t border-white/10 text-xs">
+                    <span class="text-emerald-400">✓ 4 hosts up</span>
+                </div>
+            </div>
+            
+            <!-- Scan Card 2 -->
+            <div class="card-hover bg-gradient-to-br from-zinc-950 to-black border border-cyan-500/30 rounded-3xl p-8">
+                <div class="text-cyan-400 text-4xl mb-6">🔎</div>
+                <h3 class="text-2xl font-semibold">Service Version Detection</h3>
+                <div class="text-xs text-gray-400 mt-1">nmap -sV -p- 192.168.10.10</div>
+                <p class="mt-6 text-gray-300">Identified running services: SSH, HTTP, and more with exact versions for further research.</p>
+                <div class="mt-8 pt-6 border-t border-white/10 flex gap-4 text-xs">
+                    <div class="bg-black px-3 py-1 rounded">22/tcp SSH</div>
+                    <div class="bg-black px-3 py-1 rounded">80/tcp HTTP</div>
+                </div>
+            </div>
+            
+            <!-- Scan Card 3 -->
+            <div class="card-hover bg-gradient-to-br from-zinc-950 to-black border border-purple-500/30 rounded-3xl p-8">
+                <div class="text-purple-400 text-4xl mb-6">🛡️</div>
+                <h3 class="text-2xl font-semibold">Aggressive Scan + OS Detection</h3>
+                <div class="text-xs text-gray-400 mt-1">nmap -A -O 192.168.10.0/24</div>
+                <p class="mt-6 text-gray-300">Gathered OS fingerprints, scripts, and detailed service info — key for vulnerability assessment.</p>
+                <div class="mt-8 text-xs text-amber-300">OS: Linux • Windows detected</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINDINGS / REPORT -->
+    <section id="findings" class="bg-black py-24 border-t border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-4xl font-bold text-center mb-12">Key Findings from the Scan</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="terminal-output p-8 rounded-3xl">
+                    <h4 class="text-cyan-400 font-medium mb-4 flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> Positive Discoveries
+                    </h4>
+                    <ul class="space-y-4 text-sm">
+                        <li class="flex gap-3"><span class="text-emerald-400">•</span> pfSense firewall correctly blocking unauthorized ports</li>
+                        <li class="flex gap-3"><span class="text-emerald-400">•</span> SSH service on Kali with strong version</li>
+                        <li class="flex gap-3"><span class="text-emerald-400">•</span> Clear segmentation between machines</li>
+                    </ul>
+                </div>
+                
+                <div class="terminal-output p-8 rounded-3xl">
+                    <h4 class="text-amber-400 font-medium mb-4 flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> Areas for Hardening
+                    </h4>
+                    <ul class="space-y-4 text-sm">
+                        <li class="flex gap-3"><span class="text-amber-400">•</span> Open ports on Ubuntu server (potential web service)</li>
+                        <li class="flex gap-3"><span class="text-amber-400">•</span> Default Windows ports visible</li>
+                        <li class="flex gap-3"><span class="text-amber-400">•</span> Opportunity to apply stricter firewall rules</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12 text-xs text-gray-400">
+                All scans performed ethically inside my isolated VirtualBox lab environment.
+            </div>
+        </div>
+    </section>
+
+    <!-- USEFUL NMAP COMMANDS -->
+    <section id="commands" class="max-w-7xl mx-auto px-6 py-24">
+        <h2 class="text-5xl font-bold tracking-tighter text-center mb-16">Most Used Nmap Commands</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="nmap-command p-6 rounded-3xl">
+                <code class="block text-cyan-400 text-sm">nmap -sn 192.168.10.0/24</code>
+                <p class="text-xs text-gray-400 mt-2">Ping scan / Host discovery</p>
+            </div>
+            <div class="nmap-command p-6 rounded-3xl">
+                <code class="block text-cyan-400 text-sm">nmap -sV -p 1-1000 192.168.10.10</code>
+                <p class="text-xs text-gray-400 mt-2">Version detection on common ports</p>
+            </div>
+            <div class="nmap-command p-6 rounded-3xl">
+                <code class="block text-cyan-400 text-sm">nmap -A -T4 targetIP</code>
+                <p class="text-xs text-gray-400 mt-2">Aggressive scan (OS + version + scripts)</p>
+            </div>
+            <div class="nmap-command p-6 rounded-3xl">
+                <code class="block text-cyan-400 text-sm">nmap -oX report.xml 192.168.10.0/24</code>
+                <p class="text-xs text-gray-400 mt-2">Export results to XML for reports</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEARNING OUTCOMES -->
+    <section id="learnings" class="bg-gradient-to-b from-black to-zinc-950 py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold tracking-tighter">What This Project Taught Me</h2>
+                <p class="text-purple-400">Skills directly relevant to SOC Analyst &amp; Pentesting roles</p>
+            </div>
+            
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🔍</div>
+                    <h4 class="font-semibold">Reconnaissance Mastery</h4>
+                    <p class="text-xs text-gray-400 mt-2">Ethical information gathering is the foundation of any security assessment.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-4">📊</div>
+                    <h4 class="font-semibold">Report Generation</h4>
+                    <p class="text-xs text-gray-400 mt-2">Created clean HTML/PDF reports from Nmap output.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🛠️</div>
+                    <h4 class="font-semibold">Tool Proficiency</h4>
+                    <p class="text-xs text-gray-400 mt-2">Nmap scripting engine (NSE) and timing options.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-4">⚡</div>
+                    <h4 class="font-semibold">Practical Application</h4>
+                    <p class="text-xs text-gray-400 mt-2">Applied scanning inside a real isolated lab environment.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-3xl font-semibold neon-text mb-2">Next Project → Firewall Configuration</p>
+            <p class="text-gray-400">This is Project 2 of 5 in my Cybersecurity Portfolio</p>
+            
+            <div class="mt-12 flex justify-center gap-8 text-2xl">
+                <a href="#" class="hover:text-cyan-400"><i class="fab fa-github"></i></a>
+                <a href="#" class="hover:text-cyan-400"><i class="fab fa-linkedin"></i></a>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-16">Built by ANSU • April 2026 • Pure HTML, Tailwind &amp; JavaScript</p>
+        </div>
+    </footer>
+
+    <script>
+        // Matrix rain background
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        const chars = "01アイウエオカキクケコNMAPSCANRECON";
+        const fontSize = 13;
+        let drops = [];
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(10, 10, 20, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#67e8f9';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        function initMatrix() {
+            resize();
+            drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            
+            setInterval(draw, 40);
+            
+            window.addEventListener('resize', () => {
+                resize();
+                drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            });
+        }
+        
+        // Initialize on load
+        window.onload = () => {
+            initMatrix();
+            console.log('%c✅ Nmap Recon Portfolio Website Ready!', 'color:#67e8f9; font-size:14px');
+        };
+    </script>
+</body>
+</html>
