@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Project 5: Basic Vulnerability Assessment &amp; SIEM Setup. Capstone project combining scanning, firewalling, and monitoring with OpenVAS and Elastic Stack in my virtual cybersecurity lab.">
+    <title>VULN MANAGEMENT • Vulnerability Assessment &amp; SIEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+        
+        :root {
+            --neon-orange: #f97316;
+            --neon-green: #4ade80;
+        }
+        
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 200ms;
+        }
+        
+        .neon-text {
+            text-shadow: 
+                0 0 10px var(--neon-orange),
+                0 0 25px var(--neon-orange),
+                0 0 45px var(--neon-green);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #1c1208 0%, #312e1f 100%);
+        }
+        
+        .alert-glow {
+            box-shadow: 0 0 40px -10px #f97316,
+                        0 0 70px -20px #4ade80;
+        }
+        
+        .vuln-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .vuln-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 50%;
+            height: 300%;
+            background: linear-gradient(135deg, transparent, rgba(249, 115, 22, 0.25), transparent);
+            transform: rotate(25deg);
+            animation: vuln-sweep 5s linear infinite;
+        }
+        
+        @keyframes vuln-sweep {
+            0% { transform: translate(-50%, -100%) rotate(25deg); }
+            100% { transform: translate(150%, 100%) rotate(25deg); }
+        }
+        
+        .terminal-output {
+            font-family: ui-monospace, monospace;
+            background: #1c1208;
+            border: 2px solid #f97316;
+        }
+        
+        .severity {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-[#0f0a05] text-white font-sans overflow-x-hidden">
+    <!-- Background Canvas -->
+    <canvas id="matrix" class="fixed top-0 left-0 w-full h-full z-[-1] opacity-10 pointer-events-none"></canvas>
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-orange-500/30">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-emerald-400 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-500/50">📊</div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tighter neon-text">VULN<span class="text-orange-400">MANAGE</span></h1>
+                    <p class="text-[10px] text-gray-400 -mt-1">PROJECT 05 • CAPSTONE • VULNERABILITY &amp; SIEM</p>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm uppercase tracking-widest font-medium">
+                <a href="#hero" class="hover:text-orange-400">OVERVIEW</a>
+                <a href="#assessment" class="hover:text-orange-400">ASSESSMENT</a>
+                <a href="#siem" class="hover:text-orange-400">SIEM SETUP</a>
+                <a href="#findings" class="hover:text-orange-400">FINDINGS</a>
+                <a href="#learnings" class="hover:text-orange-400">OUTCOMES</a>
+            </div>
+            
+            <a href="https://github.com/YOUR-USERNAME/vuln-assessment-siem-project" target="_blank"
+               class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-emerald-500 rounded-3xl font-semibold text-sm hover:scale-105">
+                <i class="fab fa-github"></i> 
+                GITHUB REPO
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero" class="hero-bg min-h-screen flex items-center relative">
+        <div class="max-w-7xl mx-auto px-6 pt-20">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                <div class="md:col-span-7 space-y-8">
+                    <div class="inline-flex items-center gap-2 px-6 py-2 bg-white/5 border border-orange-400/30 rounded-3xl text-orange-400 text-sm">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-400"></span>
+                        </span>
+                        CAPSTONE PROJECT • FULL BLUE-TEAM WORKFLOW
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none neon-text">
+                        VULNERABILITY ASSESSMENT<br>&amp; BASIC SIEM SETUP
+                    </h1>
+                    
+                    <p class="text-2xl text-gray-300 max-w-lg">
+                        Final project tying everything together: Ran vulnerability scans with OpenVAS, set up a basic SIEM using Elastic Stack, created dashboards, and simulated incident response in my virtual lab.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="document.getElementById('assessment').scrollIntoView({ behavior: 'smooth' })" 
+                                class="px-10 py-5 bg-orange-500 hover:bg-orange-600 text-black font-bold text-lg rounded-3xl flex items-center gap-3">
+                            <i class="fas fa-bug"></i>
+                            SEE VULNERABILITY SCANS
+                        </button>
+                        <button onclick="window.open('https://github.com/YOUR-USERNAME/vuln-assessment-siem-project', '_blank')" 
+                                class="px-10 py-5 border-2 border-white/60 hover:border-emerald-400 text-white font-semibold text-lg rounded-3xl">
+                            FULL REPORT &amp; DASHBOARDS →
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-8 text-sm">
+                        <div><i class="fas fa-search mr-2 text-orange-400"></i> OpenVAS / Nessus Essentials</div>
+                        <div><i class="fas fa-chart-bar mr-2 text-emerald-400"></i> Elastic Stack (ELK)</div>
+                        <div><i class="fas fa-shield-alt mr-2"></i> Integrated with previous projects</div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Preview -->
+                <div class="md:col-span-5">
+                    <div class="terminal-output rounded-3xl p-8 alert-glow text-sm overflow-hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-emerald-400 font-medium">SIEM DASHBOARD • LIVE</span>
+                            <span class="text-xs bg-red-900 text-red-300 px-3 py-1 rounded-full">3 Critical Alerts</span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span>High Severity: OpenSSH Vulnerability (CVE-2023-XXXX)</span>
+                                <span class="severity bg-red-600 text-white">CRITICAL</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>Medium: Apache Web Server Misconfiguration</span>
+                                <span class="severity bg-orange-600 text-white">MEDIUM</span>
+                            </div>
+                            <div class="flex justify-between items-center text-emerald-400">
+                                <span>SIEM Alert: Unusual SSH Login Attempts</span>
+                                <span class="severity bg-emerald-600 text-white">DETECTED</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-12 text-xs text-emerald-400 border-t border-white/10 pt-4">
+                            "From building the lab to detecting and responding — full security lifecycle demonstrated."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-12 left-1/2 text-xs text-gray-500 flex flex-col items-center">
+            <i class="fas fa-chevron-down animate-bounce text-3xl"></i>
+            SCROLL TO SEE THE FULL WORKFLOW
+        </div>
+    </section>
+
+    <!-- VULNERABILITY ASSESSMENT -->
+    <section id="assessment" class="max-w-7xl mx-auto px-6 py-24">
+        <div class="text-center mb-16">
+            <span class="px-5 py-2 bg-orange-900/30 text-orange-400 text-sm rounded-full">VULNERABILITY MANAGEMENT</span>
+            <h2 class="text-5xl font-bold tracking-tighter mt-4">Vulnerability Assessment Process</h2>
+            <p class="text-gray-400 mt-3">Scanned all machines in the virtual lab using OpenVAS</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="vuln-card bg-zinc-950 border border-orange-500/40 rounded-3xl p-8">
+                <div class="text-orange-400 text-5xl mb-6">🔍</div>
+                <h3 class="text-2xl font-semibold">Scan Configuration</h3>
+                <p class="text-gray-300 mt-4">Full network scan targeting 192.168.10.0/24. Used authenticated scans where possible on Ubuntu and Windows machines.</p>
+                <div class="mt-8 text-xs bg-black/70 px-4 py-2 rounded-2xl inline-block">Tool: OpenVAS • Duration: ~25 minutes</div>
+            </div>
+            
+            <div class="vuln-card bg-zinc-950 border border-emerald-400/40 rounded-3xl p-8">
+                <div class="text-emerald-400 text-5xl mb-6">📋</div>
+                <h3 class="text-2xl font-semibold">Key Vulnerabilities Found</h3>
+                <p class="text-gray-300 mt-4">Identified outdated services, weak configurations, and missing patches across the lab environment.</p>
+                <div class="mt-8 space-y-2 text-xs">
+                    <div class="flex items-center gap-3"><span class="severity bg-red-600 text-white">CRITICAL</span> OpenSSH Weak Algorithms</div>
+                    <div class="flex items-center gap-3"><span class="severity bg-orange-600 text-white">MEDIUM</span> Apache Directory Listing</div>
+                </div>
+            </div>
+            
+            <div class="vuln-card bg-zinc-950 border border-orange-500/40 rounded-3xl p-8">
+                <div class="text-orange-400 text-5xl mb-6">✅</div>
+                <h3 class="text-2xl font-semibold">Remediation Steps</h3>
+                <p class="text-gray-300 mt-4">Updated packages, applied firewall rules from Project 3, and hardened configurations based on scan results.</p>
+                <div class="mt-8 text-xs text-emerald-400">Re-scanned after fixes → Risk significantly reduced</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SIEM SETUP -->
+    <section id="siem" class="bg-black py-24 border-t border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-5xl font-bold tracking-tighter text-center mb-12">Basic SIEM Setup with Elastic Stack</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <div class="bg-zinc-950 rounded-3xl p-8 border border-emerald-400/30">
+                        <h4 class="text-emerald-400 text-xl mb-6 flex items-center gap-3">
+                            <i class="fas fa-server"></i> What I Configured
+                        </h4>
+                        <ul class="space-y-5 text-sm">
+                            <li class="flex gap-4"><span class="text-emerald-400">•</span> Installed Elasticsearch, Logstash, Kibana (ELK)</li>
+                            <li class="flex gap-4"><span class="text-emerald-400">•</span> Configured pfSense and Kali logs forwarding</li>
+                            <li class="flex gap-4"><span class="text-emerald-400">•</span> Created custom dashboards for firewall events and vulnerability alerts</li>
+                            <li class="flex gap-4"><span class="text-emerald-400">•</span> Set up basic alerts for suspicious activity</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="terminal-output p-8 rounded-3xl text-sm">
+                    <div class="text-orange-400 mb-4">Kibana Dashboard Preview</div>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-xs text-gray-400">Top Events (Last 24h)</div>
+                            <div class="h-2 bg-orange-500 rounded mt-2" style="width: 85%"></div>
+                            <div class="text-xs text-gray-400 mt-1">Blocked Connections (pfSense)</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-400">Vulnerability Alerts</div>
+                            <div class="flex gap-2 mt-2">
+                                <div class="flex-1 h-2 bg-red-500 rounded"></div>
+                                <div class="flex-1 h-2 bg-orange-500 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINDINGS -->
+    <section id="findings" class="max-w-7xl mx-auto px-6 py-24">
+        <h2 class="text-4xl font-bold text-center mb-12">Overall Project Findings &amp; Incident Response</h2>
+        
+        <div class="max-w-4xl mx-auto space-y-8">
+            <div class="bg-zinc-950 border border-orange-500/30 rounded-3xl p-8">
+                <h4 class="text-orange-400 mb-4">Simulated Incident</h4>
+                <p class="text-gray-300">Triggered a simulated port scan from Kali → Detected in SIEM via pfSense logs → Created incident report with timeline, affected assets, and recommended actions.</p>
+            </div>
+            
+            <div class="bg-zinc-950 border border-emerald-400/30 rounded-3xl p-8">
+                <h4 class="text-emerald-400 mb-4">Risk Reduction Achieved</h4>
+                <p class="text-gray-300">After remediation and rule tightening, vulnerability count dropped by over 60%. Demonstrates the value of continuous scanning and monitoring.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEARNING OUTCOMES -->
+    <section id="learnings" class="bg-gradient-to-b from-black to-[#1c1208] py-24">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold tracking-tighter">Capstone Learning Outcomes</h2>
+                <p class="text-orange-400 mt-3">Skills that make me job-ready for SOC / Security Engineer roles</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-10">
+                <div class="text-center">
+                    <div class="text-6xl mb-6">🔄</div>
+                    <h4 class="font-semibold mb-3">End-to-End Security Lifecycle</h4>
+                    <p class="text-gray-400 text-sm">From building the network → scanning → defending → monitoring → responding.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">📈</div>
+                    <h4 class="font-semibold mb-3">Vulnerability Management</h4>
+                    <p class="text-gray-400 text-sm">Practical experience with scanning, prioritization, and remediation workflows.</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-6">🚨</div>
+                    <h4 class="font-semibold mb-3">SIEM &amp; Alerting</h4>
+                    <p class="text-gray-400 text-sm">Log collection, correlation, dashboarding, and basic incident detection.</p>
+                </div>
+            </div>
+            
+            <div class="mt-20 text-center">
+                <p class="text-2xl font-medium text-emerald-300">"This complete 5-project portfolio demonstrates I can build, secure, monitor, and respond in a real-world-like environment."</p>
+                <p class="text-orange-400 mt-8 text-sm">— ANSU, April 2026</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/10 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-3xl font-semibold neon-text">Complete Cybersecurity Portfolio</p>
+            <p class="mt-4 text-gray-400">Project 5 of 5 • From Zero to Job-Ready Lab</p>
+            
+            <div class="mt-12 flex justify-center gap-6 text-2xl">
+                <a href="https://github.com/YOUR-USERNAME" target="_blank" class="hover:text-orange-400"><i class="fab fa-github"></i></a>
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-16">Built by ANSU • Thohoyandou, Limpopo • April 2026</p>
+            <p class="text-xs text-gray-500">All projects documented with clean, recruiter-friendly websites</p>
+        </div>
+    </footer>
+
+    <script>
+        // Matrix rain
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        const chars = "01VULNERABILITYSIEMELASTICOPENVASALERTDASHBOARDSCAN";
+        const fontSize = 14;
+        let drops = [];
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(15, 10, 5, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#f97316';
+            ctx.font = `${fontSize}px monospace`;
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        
+        function startMatrix() {
+            resizeCanvas();
+            drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            setInterval(draw, 45);
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                drops = Array(Math.floor(canvas.width / fontSize)).fill(1);
+            });
+        }
+        
+        window.onload = () => {
+            startMatrix();
+            console.log('%c📊 Vulnerability Assessment & SIEM Capstone Website Loaded!', 'color:#f97316; font-weight:bold');
+        };
+    </script>
+</body>
+</html>
