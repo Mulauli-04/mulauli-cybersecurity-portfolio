@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MULAULI's Cybersecurity Portfolio - 5 Hands-on Projects in IT Networks and Cybersecurity.">
+    <title>MULAULI • Cybersecurity Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap');
+        
+        :root {
+            --neon-cyan: #22d3ee;
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+        }
+        
+        .project-card {
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 30px 70px -15px rgb(34 211 238 / 0.4);
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a2333 100%);
+        }
+        
+        .profile-img {
+            border: 6px solid #22d3ee;
+            box-shadow: 0 0 40px rgba(34, 211, 238, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-black text-white font-sans">
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-black/90 backdrop-blur-xl border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-2xl flex items-center justify-center text-xl">🛡️</div>
+                <h1 class="text-2xl font-bold tracking-tighter neon-text">MULAULI</h1>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium">
+                <a href="#projects" class="hover:text-cyan-400">PROJECTS</a>
+                <a href="#about" class="hover:text-cyan-400">ABOUT</a>
+                <a href="#contact" class="hover:text-cyan-400">CONTACT</a>
+            </div>
+            <a href="https://github.com/YOUR-USERNAME" target="_blank" 
+               class="px-6 py-3 bg-white text-black rounded-3xl font-semibold flex items-center gap-2 hover:bg-cyan-400">
+                <i class="fab fa-github"></i> GITHUB
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO WITH PROFILE PICTURE -->
+    <section class="hero-bg min-h-screen flex items-center">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                <!-- Left: Text -->
+                <div class="md:col-span-7">
+                    <div class="inline-flex items-center gap-2 bg-white/10 px-6 py-2 rounded-3xl text-cyan-400 text-sm mb-6">
+                        <span class="animate-pulse">●</span> 
+                        ENTRY-LEVEL CYBERSECURITY PORTFOLIO
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter leading-none neon-text mb-6">
+                        NETSHAMUTSHEDZI MULAULI <br>
+                    </h1>
+                    
+                    <p class="max-w-xl text-2xl text-gray-300 mb-10">
+                        5 hands-on projects in IT Networks &amp; Cybersecurity. 
+                        From building an isolated lab to full vulnerability management and SIEM.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#projects" 
+                           class="px-10 py-5 bg-gradient-to-r from-cyan-500 to-purple-600 text-black font-bold text-lg rounded-3xl flex items-center justify-center gap-3 hover:scale-105">
+                            EXPLORE ALL PROJECTS
+                        </a>
+                        <a href="https://github.com/YOUR-USERNAME/cybersecurity-portfolio" target="_blank"
+                           class="px-10 py-5 border-2 border-white/70 hover:border-cyan-400 text-white font-semibold text-lg rounded-3xl flex items-center justify-center gap-3">
+                            VIEW ON GITHUB
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Right: Profile Picture -->
+                <div class="md:col-span-5 flex justify-center">
+                    <div class="relative">
+                        <img src="images/profile/2.jpg" 
+                             alt="MULAULI - Cybersecurity Professional" 
+                             class="profile-img w-80 h-80 md:w-96 md:h-96 object-cover rounded-3xl">
+                        <!-- Optional subtle glow ring -->
+                        <div class="absolute -inset-4 border border-cyan-400/30 rounded-[2.5rem] -z-10"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-20 flex justify-center gap-12 text-sm text-gray-400">
+                <div>VirtualBox Lab</div>
+                <div>Nmap Recon</div>
+                <div>pfSense Firewall</div>
+                <div>Wireshark Analysis</div>
+                <div>Vuln + SIEM</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS GRID (same as before, shortened for brevity) -->
+    <section id="projects" class="max-w-7xl mx-auto px-6 py-24">
+        <h2 class="text-5xl font-bold text-center mb-4 tracking-tighter">My 5-Project Cybersecurity Journey</h2>
+        <p class="text-center text-gray-400 mb-16 max-w-md mx-auto">
+            Each project builds on the previous one. Click any card to visit the dedicated project website.
+        </p>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Project 1 -->
+            <a href="Projects/n.html" class="project-card group bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden">
+                <div class="h-56 bg-gradient-to-br from-blue-900 to-black flex items-center justify-center text-7xl">🏠</div>
+                <div class="p-8">
+                    <div class="text-cyan-400 text-sm font-medium mb-2">PROJECT 01</div>
+                    <h3 class="text-2xl font-semibold mb-3">Virtual Cybersecurity Home Network Lab</h3>
+                    <p class="text-gray-400 text-sm">Built a fully isolated multi-machine environment with pfSense as the central firewall.</p>
+                </div>
+            </a>
+
+            <!-- Project 2 -->
+            <a href="Projects/r.html" class="project-card group bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden">
+                <div class="h-56 bg-gradient-to-br from-purple-900 to-black flex items-center justify-center text-7xl">🔍</div>
+                <div class="p-8">
+                    <div class="text-cyan-400 text-sm font-medium mb-2">PROJECT 02</div>
+                    <h3 class="text-2xl font-semibold mb-3">Network Scanning &amp; Recon with Nmap</h3>
+                    <p class="text-gray-400 text-sm">Performed host discovery, service enumeration, and OS detection.</p>
+                </div>
+            </a>
+
+            <!-- Project 3 -->
+            <a href="Projects/3.html" class="project-card group bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden">
+                <div class="h-56 bg-gradient-to-br from-red-900 to-black flex items-center justify-center text-7xl">🛡️</div>
+                <div class="p-8">
+                    <div class="text-cyan-400 text-sm font-medium mb-2">PROJECT 03</div>
+                    <h3 class="text-2xl font-semibold mb-3">Personal Firewall &amp; Access Controls</h3>
+                    <p class="text-gray-400 text-sm">Configured pfSense with strict rules, NAT, and logging.</p>
+                </div>
+            </a>
+
+            <!-- Project 4 -->
+            <a href="Projects/4.html" class="project-card group bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden">
+                <div class="h-56 bg-gradient-to-br from-cyan-900 to-black flex items-center justify-center text-7xl">📡</div>
+                <div class="p-8">
+                    <div class="text-cyan-400 text-sm font-medium mb-2">PROJECT 04</div>
+                    <h3 class="text-2xl font-semibold mb-3">Packet Analysis with Wireshark</h3>
+                    <p class="text-gray-400 text-sm">Captured and analyzed real traffic and protocols.</p>
+                </div>
+            </a>
+
+            <!-- Project 5 -->
+            <a href="Projects/5.html" class="project-card group bg-zinc-900 border border-white/10 rounded-3xl overflow-hidden">
+                <div class="h-56 bg-gradient-to-br from-orange-900 to-black flex items-center justify-center text-7xl">📊</div>
+                <div class="p-8">
+                    <div class="text-cyan-400 text-sm font-medium mb-2">PROJECT 05 • CAPSTONE</div>
+                    <h3 class="text-2xl font-semibold mb-3">Vulnerability Assessment &amp; Basic SIEM</h3>
+                    <p class="text-gray-400 text-sm">OpenVAS scans + Elastic Stack dashboards and incident simulation.</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- ABOUT and FOOTER remain the same as previous version -->
+    <!-- (Copy the About and Footer sections from the previous main portfolio code I gave you) -->
+
+    <script>
+        console.log('%c✅ MULAULI Cybersecurity Portfolio with Profile Picture Loaded!', 'color:#22d3ee; font-size:16px; font-weight:bold');
+    </script>
+</body>
+</html>
